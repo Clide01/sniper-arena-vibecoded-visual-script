@@ -1,15 +1,22 @@
 -- ==============================================================================
--- DIAGNOSTIC HUB V57: MODULAR ARSENAL SPOOFER (HYBRID PROTECTED)
--- Patched: Network-Layer Packet Interception for Full Audio/VFX Injection
+-- DIAGNOSTIC HUB V69: MASTER ARSENAL SPOOFER (CLOUD-DATABASE PIPELINE)
+-- Patched: All Skins and Animation Arrays moved to secure external Gist dependencies.
+-- Architecture: V57 Core Spoofing + V60 Isolation + V65 Network Masking + V69 Anims
 -- ==============================================================================
 
-local Il1l=loadstring;local l1ll=game;local l11I=l1ll.HttpGet;local lII1=l1ll.GetService;
-local O0OO=Il1l(l11I(l1ll,'\104\116\116\112\115\58\47\47\115\105\114\105\117\115\46\109\101\110\117\47\114\97\121\102\105\101\108\100'))();
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local Players = game:GetService('Players')
+local Workspace = game:GetService('Workspace')
 
--- 1. FETCH EXTERNAL DATABASE
--- REPLACE THIS STRING WITH YOUR RAW GITHUB LINK TO Skins_Database.lua
-local dbUrl = "https://raw.githubusercontent.com/Clide01/sniper-arena-vibecoded-visual-script/refs/heads/main/Skins_Database.lua" .. "?t=" .. tostring(tick())
-local SkinDB = loadstring(game:HttpGet(dbUrl))()
+local LocalPlayer = Players.LocalPlayer
+
+-- 1. FETCH EXTERNAL DATABASES (SECRET GISTS)
+local skinDbUrl = "https://gist.githubusercontent.com/Clide01/4e7b2abdb007ab6714c5eae2a2c4c63a/raw/f9635dc5d41af3de167e32b785fee9f33704adaf/Skins_Database.lua" .. "?t=" .. tostring(tick())
+local SkinDB = loadstring(game:HttpGet(skinDbUrl))()
+
+local animDbUrl = "https://gist.githubusercontent.com/Clide01/832d96c911bc4b02fb484fe28424b31f/raw/31fbf9e590a4ae5046350cc2b4785f64d96becd6/Animations_Database.lua" .. "?t=" .. tostring(tick())
+local AnimationDB = loadstring(game:HttpGet(animDbUrl))()
 
 -- 2. INITIALIZE GLOBAL STATE
 getgenv().VisualSpooferState = {
@@ -21,133 +28,165 @@ getgenv().VisualSpooferState = {
 }
 
 -- 3. BUILD UI (The View)
-local llIl=O0OO:CreateWindow({Name="Modular Arsenal Spoofer",LoadingTitle="Loading V57 Framework...",LoadingSubtitle="by Clide01",ConfigurationSaving={Enabled=false},KeySystem=false});
-local lIIl=llIl:CreateTab("Arsenal Spoofer");
-
--- [SECTION: PRIMARY WEAPON]
-lIIl:CreateSection("Primary Weapon")
-lIIl:CreateDropdown({
-   Name = "Equipped Primary (Base)",
-   Options = SkinDB.PrimaryBases,
-   CurrentOption = {getgenv().VisualSpooferState.PrimaryBase},
-   MultipleOptions = false,
-   Callback = function(Options) getgenv().VisualSpooferState.PrimaryBase = Options[1] end,
+local Window = Rayfield:CreateWindow({
+    Name="Modular Arsenal Spoofer",
+    LoadingTitle="Loading V69 Master...",
+    LoadingSubtitle="by Clide01",
+    ConfigurationSaving={Enabled=false},
+    KeySystem=false
 })
+local Tab = Window:CreateTab("Arsenal Spoofer")
 
+Tab:CreateSection("Primary Weapon")
+Tab:CreateDropdown({Name="Equipped Primary (Base)",Options=SkinDB.PrimaryBases,CurrentOption={getgenv().VisualSpooferState.PrimaryBase},MultipleOptions=false,Callback=function(Options) getgenv().VisualSpooferState.PrimaryBase = Options[1] end})
 local PrimaryDropdown 
-lIIl:CreateInput({
-   Name = "Search Primary Skins",
-   PlaceholderText = "Type to filter...",
-   Callback = function(Text)
+Tab:CreateInput({Name="Search Primary Skins",PlaceholderText="Type to filter...",Callback=function(Text)
        local filtered = {}
-       local query = string.lower(Text)
-       for _, skin in ipairs(SkinDB.PrimarySkins) do
-           if string.find(string.lower(skin), query) then table.insert(filtered, skin) end
-       end
+       for _, skin in ipairs(SkinDB.PrimarySkins) do if string.find(string.lower(skin), string.lower(Text)) then table.insert(filtered, skin) end end
        if #filtered == 0 then table.insert(filtered, "No Results") end
        if PrimaryDropdown then PrimaryDropdown:Refresh(filtered, true) end
-   end,
-})
+end})
+PrimaryDropdown = Tab:CreateDropdown({Name="Target Primary (Skin)",Options=SkinDB.PrimarySkins,CurrentOption={getgenv().VisualSpooferState.PrimaryTarget},MultipleOptions=false,Callback=function(Options) if Options[1] ~= "No Results" then getgenv().VisualSpooferState.PrimaryTarget = Options[1] end end})
 
-PrimaryDropdown = lIIl:CreateDropdown({
-   Name = "Target Primary (Skin)",
-   Options = SkinDB.PrimarySkins,
-   CurrentOption = {getgenv().VisualSpooferState.PrimaryTarget},
-   MultipleOptions = false,
-   Callback = function(Options) if Options[1] ~= "No Results" then getgenv().VisualSpooferState.PrimaryTarget = Options[1] end end,
-})
-
--- [SECTION: MELEE WEAPON]
-lIIl:CreateSection("Melee Weapon")
-lIIl:CreateDropdown({
-   Name = "Equipped Melee (Base)",
-   Options = SkinDB.MeleeBases,
-   CurrentOption = {getgenv().VisualSpooferState.MeleeBase},
-   MultipleOptions = false,
-   Callback = function(Options) getgenv().VisualSpooferState.MeleeBase = Options[1] end,
-})
-
+Tab:CreateSection("Melee Weapon")
+Tab:CreateDropdown({Name="Equipped Melee (Base)",Options=SkinDB.MeleeBases,CurrentOption={getgenv().VisualSpooferState.MeleeBase},MultipleOptions=false,Callback=function(Options) getgenv().VisualSpooferState.MeleeBase = Options[1] end})
 local MeleeDropdown
-lIIl:CreateInput({
-   Name = "Search Melee Skins",
-   PlaceholderText = "Type to filter...",
-   Callback = function(Text)
+Tab:CreateInput({Name="Search Melee Skins",PlaceholderText="Type to filter...",Callback=function(Text)
        local filtered = {}
-       local query = string.lower(Text)
-       for _, skin in ipairs(SkinDB.MeleeSkins) do
-           if string.find(string.lower(skin), query) then table.insert(filtered, skin) end
-       end
+       for _, skin in ipairs(SkinDB.MeleeSkins) do if string.find(string.lower(skin), string.lower(Text)) then table.insert(filtered, skin) end end
        if #filtered == 0 then table.insert(filtered, "No Results") end
        if MeleeDropdown then MeleeDropdown:Refresh(filtered, true) end
-   end,
-})
+end})
+MeleeDropdown = Tab:CreateDropdown({Name="Target Melee (Skin)",Options=SkinDB.MeleeSkins,CurrentOption={getgenv().VisualSpooferState.MeleeTarget},MultipleOptions=false,Callback=function(Options) if Options[1] ~= "No Results" then getgenv().VisualSpooferState.MeleeTarget = Options[1] end end})
 
-MeleeDropdown = lIIl:CreateDropdown({
-   Name = "Target Melee (Skin)",
-   Options = SkinDB.MeleeSkins,
-   CurrentOption = {getgenv().VisualSpooferState.MeleeTarget},
-   MultipleOptions = false,
-   Callback = function(Options) if Options[1] ~= "No Results" then getgenv().VisualSpooferState.MeleeTarget = Options[1] end end,
-})
+-- 4. INJECT ENGINE & NETWORK HOOKS (The Controller)
+Tab:CreateSection("Execution")
 
--- 4. INJECT ENGINE & NETWORK HOOKS (The Controller - OBFUSCATED)
-lIIl:CreateSection("Execution")
-local O00O=lII1(l1ll,'\82\101\112\108\105\99\97\116\101\100\83\116\111\114\97\103\101');local O0l1=lII1(l1ll,'\80\108\97\121\101\114\115');local Ol10=lII1(l1ll,'\87\111\114\107\115\112\97\99\101');local llO0=O0l1.LocalPlayer;local OOO0=getgenv;local OO0O=type;local O0O0=string.find;local O000=pcall;local lIII=require;local IlII=ipairs;local O011=pairs;local lI1I=typeof;
-lIIl:CreateButton({Name="Initialize Dual-Channel Hooks (Run Once)",Callback=function()
-if OOO0().VisualSpooferState.IsHooked then O0OO:Notify({Title="Already Hooked!",Content="Update dropdowns and reset character to apply changes!",Duration=4});return end;
+Tab:CreateButton({Name="Initialize Master Hooks (Run Once)",Callback=function()
+    if getgenv().VisualSpooferState.IsHooked then 
+        Rayfield:Notify({Title="Already Hooked!",Content="Update dropdowns and reset character to apply changes!",Duration=4})
+        return 
+    end
 
--- NETWORK LAYER HOOK (Intercepts Server Validation)
-local oldNamecall;
-oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod();
-    local args = {...};
-    if not checkcaller() and (method == "FireServer" or method == "InvokeServer") then
-        local state = OOO0().VisualSpooferState;
-        if state and state.IsHooked then
-            for i, v in pairs(args) do
-                if type(v) == "string" then
-                    if v == state.PrimaryTarget then args[i] = state.PrimaryBase;
-                    elseif v == state.MeleeTarget then args[i] = state.MeleeBase; end
+    local oldNewIndex
+    oldNewIndex = hookmetamethod(game, "__newindex", function(t, k, v)
+        if not checkcaller() and k == "Image" and typeof(v) == "Instance" then v = "rbxassetid://0" end
+        return oldNewIndex(t, k, v)
+    end)
+
+    local function DeepMaskTable(tbl, state)
+        for k, v in pairs(tbl) do
+            if type(v) == "string" then
+                if v == state.PrimaryTarget then tbl[k] = state.PrimaryBase
+                elseif v == state.MeleeTarget then tbl[k] = state.MeleeBase end
+            elseif type(v) == "table" then DeepMaskTable(v, state) end
+        end
+    end
+
+    local oldNamecall
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+        if not checkcaller() and (method == "FireServer" or method == "InvokeServer") then
+            local state = getgenv().VisualSpooferState
+            if state and state.IsHooked then
+                for i, v in pairs(args) do
+                    if type(v) == "string" then
+                        if v == state.PrimaryTarget then args[i] = state.PrimaryBase
+                        elseif v == state.MeleeTarget then args[i] = state.MeleeBase end
+                    elseif type(v) == "table" then DeepMaskTable(args[i], state) end
                 end
             end
+            return oldNamecall(self, unpack(args))
         end
-        return oldNamecall(self, unpack(args));
-    end
-    return oldNamecall(self, ...);
-end);
+        return oldNamecall(self, ...)
+    end)
 
--- OOP ENGINE HOOK (Permanent Local Spoofing for Full Audio/VFX)
-local l=O00O.Client['\87\101\97\112\111\110\67\111\110\116\114\111\108\108\101\114']:WaitForChild('\87\101\97\112\111\110');local I={l,l:FindFirstChild('\71\117\110'),l:FindFirstChild('\77\101\108\101\101')};local O=0;
-local i={'\83\101\116\83\107\105\110','\95\108\111\97\100\77\111\100\101\108','\95\115\101\116\117\112\77\111\100\101\108','\76\111\97\100\83\107\105\110\101\100\65\115\115\101\116\115', '\80\108\97\121\83\111\117\110\100', '\95\112\108\97\121\83\111\117\110\100', '\71\101\116\67\111\110\102\105\103'};
-for _,o in IlII(I) do if o then local O0,OO=O000(lIII,o);if O0 and OO0O(OO)=="table" then for _,O1 in IlII(i) do if OO0O(OO[O1])=="function" and not OO["_H"..O1] then OO["_H"..O1]=true;local I0=OO[O1];
-OO[O1]=function(self,I1,...) 
-    local I2=false;if self.ModelName and OO0O(self.ModelName)=="string" and O0O0(self.ModelName,"ThirdPerson") then I2=true end;
-    for _,l0 in O011({I1,...}) do if OO0O(l0)=="string" and (O0O0(l0,"ThirdPerson") or O0O0(l0,"Carry")) then I2=true end end;
-    local O1O=self.Model or self.model or self.Instance or self.WeaponModel;
-    if lI1I(O1O)=="Instance" then local lO0=O1O:FindFirstAncestorWhichIsA("Model");if lO0 and lO0:FindFirstChild("Humanoid") and lO0.Name~=llO0.Name then I2=true end end;
+    local weaponModule = ReplicatedStorage.Client['WeaponController']:WaitForChild('Weapon')
+    local targets = {weaponModule, weaponModule:FindFirstChild('Gun'), weaponModule:FindFirstChild('Melee')}
+    local hooksApplied = 0
+    local targetMethods = {'SetSkin', '_loadModel', '_setupModel', 'LoadSkinedAssets', 'PlaySound', '_playSound', 'GetConfig', 'PlayAnimation', '_playAnimation', 'LoadAnimation'}
     
-    if I2 then return I0(self,I1,...) end;
-    
-    local I3=OOO0().VisualSpooferState;
-    local spoofedArg = I1;
-    
-    -- Spoof function arguments to force effect loading
-    if OO0O(I1)=="string" then 
-        if O0O0(I1,I3.PrimaryBase) then spoofedArg=I3.PrimaryTarget 
-        elseif O0O0(I1,I3.MeleeBase) then spoofedArg=I3.MeleeTarget end 
-    end;
-    
-    -- Permanently spoof properties to grant Full Audio & VFX mapping
-    if self.Name then 
-        if O0O0(self.Name,I3.PrimaryBase) or self.Name == I3.PrimaryTarget then 
-            self.Skin=I3.PrimaryTarget; self.Name=I3.PrimaryTarget; 
-            if self.WeaponName then self.WeaponName = I3.PrimaryTarget end
-        elseif O0O0(self.Name,I3.MeleeBase) or self.Name == I3.MeleeTarget then 
-            self.Skin=I3.MeleeTarget; self.Name=I3.MeleeTarget; 
-            if self.WeaponName then self.WeaponName = I3.MeleeTarget end
+    for _, moduleInstance in ipairs(targets) do 
+        if moduleInstance then 
+            local success, ClassTable = pcall(require, moduleInstance)
+            if success and type(ClassTable) == "table" then 
+                for _, methodName in ipairs(targetMethods) do 
+                    if type(ClassTable[methodName]) == "function" and not ClassTable["_H"..methodName] then 
+                        ClassTable["_H"..methodName] = true
+                        local originalMethod = ClassTable[methodName]
+                        
+                        ClassTable[methodName] = function(self, arg1, ...) 
+                            for _, arg in pairs({arg1, ...}) do 
+                                if type(arg) == "string" then
+                                    if string.find(arg, "ThirdPerson") or string.find(arg, "Carry") then self._IsEnemyWeaponBrand = true 
+                                    elseif string.find(arg, "FirstPerson") then self._IsLocalWeaponBrand = true end
+                                end
+                            end
+
+                            if not self._IsEnemyWeaponBrand and not self._IsLocalWeaponBrand then
+                                local weaponModel = self.Model or self.model or self.Instance or self.WeaponModel
+                                if typeof(weaponModel) == "Instance" and weaponModel:IsDescendantOf(Workspace.CurrentCamera) then self._IsLocalWeaponBrand = true end
+                                if self.IsLocal == true or self.isLocal == true or self.IsFirstPerson == true then self._IsLocalWeaponBrand = true end
+                            end
+
+                            if self._IsEnemyWeaponBrand or not self._IsLocalWeaponBrand then
+                                return originalMethod(self, arg1, ...)
+                            end
+                            
+                            local state = getgenv().VisualSpooferState
+                            local spoofedArg = arg1
+                            
+                            -- ========================================================
+                            -- V69 CLOUD-ANIMATION HIJACKING
+                            -- ========================================================
+                            if typeof(arg1) == "Instance" and arg1:IsA("Animation") then
+                                local animName = string.lower(arg1.Name)
+                                
+                                local isPrimary = self.Name and (string.find(self.Name, state.PrimaryBase) or self.Name == state.PrimaryTarget)
+                                local isMelee = self.Name and (string.find(self.Name, state.MeleeBase) or self.Name == state.MeleeTarget)
+
+                                if isPrimary and AnimationDB[state.PrimaryTarget] then
+                                    local pData = AnimationDB[state.PrimaryTarget]
+                                    if (string.find(animName, "view") or string.find(animName, "inspect")) and pData.View then arg1.AnimationId = "rbxassetid://" .. pData.View
+                                    elseif (string.find(animName, "switch") or string.find(animName, "equip")) and pData.Switch then arg1.AnimationId = "rbxassetid://" .. pData.Switch end
+                                elseif isMelee and AnimationDB[state.MeleeTarget] then
+                                    local mData = AnimationDB[state.MeleeTarget]
+                                    if (string.find(animName, "view") or string.find(animName, "inspect")) and mData.View then arg1.AnimationId = "rbxassetid://" .. mData.View
+                                    elseif (string.find(animName, "switch") or string.find(animName, "equip")) and mData.Switch then arg1.AnimationId = "rbxassetid://" .. mData.Switch end
+                                end
+                            end
+
+                            if type(arg1) == "string" then 
+                                if string.find(arg1, state.PrimaryBase) then spoofedArg = state.PrimaryTarget 
+                                elseif string.find(arg1, state.MeleeBase) then spoofedArg = state.MeleeTarget end 
+                            end
+                            
+                            if self.Name then 
+                                if string.find(self.Name, state.PrimaryBase) or self.Name == state.PrimaryTarget then 
+                                    self.Skin = state.PrimaryTarget; self.Name = state.PrimaryTarget 
+                                    if self.WeaponName then self.WeaponName = state.PrimaryTarget end
+                                elseif string.find(self.Name, state.MeleeBase) or self.Name == state.MeleeTarget then 
+                                    self.Skin = state.MeleeTarget; self.Name = state.MeleeTarget 
+                                    if self.WeaponName then self.WeaponName = state.MeleeTarget end
+                                end 
+                            end
+                            
+                            return originalMethod(self, spoofedArg, ...)
+                        end
+                        hooksApplied = hooksApplied + 1 
+                    end 
+                end 
+            end 
         end 
-    end;
+    end
     
-    return I0(self,spoofedArg,...);
-end;O=O+1 end end end end end;
-if O>0 then OOO0().VisualSpooferState.IsHooked=true;O0OO:Notify({Title="Network & Engine Hijacked!",Content="Hooks active. Full Audio & VFX Injected!",Duration=6}) else O0OO:Notify({Title="Failed",Content="Could not hook initialization classes.",Duration=5}) end end});O0OO:Init();
+    if hooksApplied > 0 then 
+        getgenv().VisualSpooferState.IsHooked = true
+        Rayfield:Notify({Title="V69 Framework Online!",Content="Cloud Databases Connected. Premium Animations Active!",Duration=6}) 
+    else 
+        Rayfield:Notify({Title="Failed",Content="Could not hook initialization classes.",Duration=5}) 
+    end 
+end})
+
+Rayfield:Init()
