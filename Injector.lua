@@ -6,7 +6,7 @@ local Workspace = game:GetService('Workspace')
 local LocalPlayer = Players.LocalPlayer
 
 -- 1. FETCH EXTERNAL DATABASE (SECRET GIST)
-local skinDbUrl = "PASTE_RAW_SKINS_GIST_LINK_HERE" .. "?t=" .. tostring(tick())
+local skinDbUrl = "https://gist.githubusercontent.com/Clide01/4e7b2abdb007ab6714c5eae2a2c4c63a/raw/f9635dc5d41af3de167e32b785fee9f33704adaf/Skins_Database.lua" .. "?t=" .. tostring(tick())
 local SkinDB = loadstring(game:HttpGet(skinDbUrl))()
 
 -- 2. INITIALIZE GLOBAL STATE
