@@ -31,7 +31,7 @@ local Window = Rayfield:CreateWindow({
         Note = "Complete the ads to generate today's master key.",
         FileName = "ClideSpooferKeyConfig", 
         SaveKey = false, -- Automatically caches key in user's workspace folder
-        GrabKeyFromUrl = true, 
+        GrabKeyFromSite = true, 
         Key = {"https://pastebin.com/raw/6aje5Kp8"}, -- CHANGE THIS to your secret master key
         Url = "https://controlc.com/xbazx9pa" -- CHANGE THIS to your monetization link
     }
